@@ -6,6 +6,9 @@ import io
 import copy
 from ..config import *
 import pickle
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PwebProcessorBase(object):
     """Processors run code from parsed Pweave documents. This is an abstract base
@@ -32,10 +35,10 @@ class PwebProcessorBase(object):
         if self.documentationmode:
             success = self._getoldresults()
             if success:
-                print("Restoring cached results")
+                logger.info("Restoring cached results")
                 return
             else:
-                sys.stderr.write(
+                logger.warn(
                     "DOCUMENTATION MODE ERROR:\nCan't find stored results, running the code and caching results for the next documentation mode run\n")
                 rcParams["storeresults"] = True
 
@@ -126,7 +129,7 @@ class PwebProcessorBase(object):
 
 
         if chunk['type'] == 'code':
-            sys.stdout.write("Processing chunk %(number)s named %(name)s from line %(start_line)s\n" % chunk)
+            logger.info("Processing chunk %(number)s named %(name)s from line %(start_line)s" % chunk)
 
             old_content = None
             if not chunk["complete"]:
