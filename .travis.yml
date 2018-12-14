@@ -37,9 +37,6 @@ install:
         pip install .[test];
     fi
 
-notifications:
-  email: false
-
 # Run test
 script:
   - nosetests --with-coverage --cover-package=pweave
