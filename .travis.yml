@@ -23,15 +23,16 @@ matrix:
 before_install:
   - if [[ $PYTHON_FLAVOR == "conda" ]];
     then
-      source .conda_ci_before_install.sh;
+        export PATH=/home/travis/miniconda3/bin:$PATH &&
+        bash .conda_ci_before_install.sh;
      else
-       pip install --upgrade pip;
+        pip install --upgrade pip;
      fi
 
 install:
   - if [[ $PYTHON_FLAVOR == "conda" ]];
     then
-        source .conda_ci_install.sh;
+        bash .conda_ci_install.sh;
     else
         pip install .[test];
     fi
