@@ -20,7 +20,7 @@ import statsmodels
 import matplotlib.pyplot as plt
 
 #' Statsmodels api seems to change often, check release version:
-#+ term=True
+# + term=True
 
 statsmodels.__version__
 
@@ -32,7 +32,9 @@ statsmodels.__version__
 
 #' Load dataset using Pandas:
 
-url = 'https://raw.githubusercontent.com/mpastell/Rdatasets/master/csv/MASS/whiteside.csv'
+url = (
+    "https://raw.githubusercontent.com/mpastell/Rdatasets/master/csv/MASS/whiteside.csv"
+)
 whiteside = pd.read_csv(url)
 
 #' # Fitting the model
@@ -40,21 +42,23 @@ whiteside = pd.read_csv(url)
 #' See [statsmodels documentation](http://statsmodels.sourceforge.net/devel/example_formulas.html)
 #' for more information about the syntax.
 
-model = sm.ols(formula='Gas ~ Temp', data=whiteside, subset = whiteside['Insul']=="Before")
+model = sm.ols(
+    formula="Gas ~ Temp", data=whiteside, subset=whiteside["Insul"] == "Before"
+)
 fitted = model.fit()
 print(fitted.summary())
 
 #' # Plot the data and fit
 
 Before = whiteside[whiteside["Insul"] == "Before"]
-plt.plot(Before["Temp"], Before["Gas"], 'ro')
-plt.plot(Before["Temp"], fitted.fittedvalues, 'b')
-plt.legend(['Data', 'Fitted model'])
+plt.plot(Before["Temp"], Before["Gas"], "ro")
+plt.plot(Before["Temp"], fitted.fittedvalues, "b")
+plt.legend(["Data", "Fitted model"])
 plt.ylim(0, 10)
 plt.xlim(-2, 12)
-plt.xlabel('Temperature')
-plt.ylabel('Gas')
-plt.title('Before Insulation')
+plt.xlabel("Temperature")
+plt.ylabel("Gas")
+plt.title("Before Insulation")
 
 #' # Fit diagnostiscs
 #' Statsmodels [OLSresults](http://statsmodels.sourceforge.net/devel/generated/statsmodels.regression.linear_model.OLSResults.html) objects contain the usual diagnostic information about the model and you can use the `get_influence()` method to get more diagnostic information (such as Cook's distance).
@@ -63,8 +67,8 @@ plt.title('Before Insulation')
 #' Histogram of normalized residuals
 
 plt.hist(fitted.resid_pearson)
-plt.ylabel('Count')
-plt.xlabel('Normalized residuals')
+plt.ylabel("Count")
+plt.xlabel("Normalized residuals")
 
 
 #' ## Cooks distance
@@ -73,7 +77,7 @@ plt.xlabel('Normalized residuals')
 #'  objects contain more diagnostic information
 
 influence = fitted.get_influence()
-#c is the distance and p is p-value
+# c is the distance and p is p-value
 (c, p) = influence.cooks_distance
 plt.stem(np.arange(len(c)), c, markerfmt=",")
 
@@ -83,5 +87,6 @@ plt.stem(np.arange(len(c)), c, markerfmt=",")
 #' Statsmodels includes a some builtin function for plotting residuals against leverage:
 
 from statsmodels.graphics.regressionplots import *
+
 plot_leverage_resid2(fitted)
 influence_plot(fitted)
