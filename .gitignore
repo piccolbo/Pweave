@@ -1,5 +1,5 @@
 
-##Test artefacts
+##Test artifacts
 tests/processors/cache/
 tests/processors/ipy_processor_test.txt
 tests/processors/processor_test.txt
@@ -29,6 +29,7 @@ tests/formats/formatters_url.pmd
 tests/publish/cache/
 tmp/
 .ipynb_checkpoints/*
+.pytest_cache/*
 
 run_tests.sh
 koe*.py
@@ -53,6 +54,7 @@ tests/*/*.png
 # Packages
 *.egg
 *.egg-info
+.eggs/*
 dist
 build
 eggs
