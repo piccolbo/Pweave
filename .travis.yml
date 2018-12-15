@@ -39,7 +39,7 @@ install:
 # Run test
 script:
   - nosetests --with-coverage --cover-package=pweave
-  - black --check .
+  - black --check pweave/ doc/ tests/ --exclude .\*REF.py
 
 # Calculate coverage
 after_success:
