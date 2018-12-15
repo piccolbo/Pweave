@@ -10,12 +10,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class PwebProcessorBase(object):
     """Processors run code from parsed Pweave documents. This is an abstract base
     class for specific implementations"""
 
-    def __init__(self, parsed, kernel, source, docmode,
-                       figdir, outdir):
+    def __init__(self, parsed, kernel, source, docmode, figdir, outdir):
         self.parsed = parsed
         self.source = source
         self.documentationmode = docmode
@@ -39,7 +39,8 @@ class PwebProcessorBase(object):
                 return
             else:
                 logger.warn(
-                    "DOCUMENTATION MODE ERROR:\nCan't find stored results, running the code and caching results for the next documentation mode run\n")
+                    "DOCUMENTATION MODE ERROR:\nCan't find stored results, running the code and caching results for the next documentation mode run\n"
+                )
                 rcParams["storeresults"] = True
 
         self.executed = []
@@ -51,7 +52,6 @@ class PwebProcessorBase(object):
                 self.executed = self.executed + res
             else:
                 self.executed.append(res)
-
 
         self.isexecuted = True
         if rcParams["storeresults"]:
@@ -66,7 +66,7 @@ class PwebProcessorBase(object):
             os.makedirs(figdir)
 
     def getresults(self):
-        #flattened = list(itertools.chain.from_iterable(self.executed))
+        # flattened = list(itertools.chain.from_iterable(self.executed))
         return copy.deepcopy(self.executed)
 
     def store(self, data):
@@ -75,7 +75,7 @@ class PwebProcessorBase(object):
         self.ensureDirectoryExists(cachedir)
 
         name = cachedir + "/" + self.basename + ".pkl"
-        f = open(name, 'wb')
+        f = open(name, "wb")
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
         f.close()
 
@@ -85,7 +85,7 @@ class PwebProcessorBase(object):
         name = cachedir + "/" + self.basename + ".pkl"
 
         if os.path.exists(name):
-            f = open(name, 'rb')
+            f = open(name, "rb")
             self._oldresults = pickle.load(f)
             f.close()
             return True
@@ -94,11 +94,11 @@ class PwebProcessorBase(object):
 
     def _runcode(self, chunk):
         """Execute code from a code chunk based on options"""
-        if chunk['type'] != 'doc' and chunk['type'] != 'code':
+        if chunk["type"] != "doc" and chunk["type"] != "code":
             return chunk
 
         # Add defaultoptions to parsed options
-        if chunk['type'] == 'code':
+        if chunk["type"] == "code":
             defaults = rcParams["chunk"]["defaultoptions"].copy()
             defaults.update(chunk["options"])
             chunk.update(defaults)
@@ -106,51 +106,60 @@ class PwebProcessorBase(object):
             # it is added afterwards to support adding options as
             # metadata to notebooks
             chunk["options"] = defaults
-            #del chunk['options']
+            # del chunk['options']
 
         # Read the content from file or object
-        if 'source' in chunk:
-            if os.path.isfile(os.path.join(self.cwd, chunk['source'])):
-                source = os.path.join(self.cwd, chunk['source'])
-                chunk["content"] = "\n" + io.open(source, "r", encoding='utf-8').read().rstrip() + "\n" + chunk[
-                    'content']
+        if "source" in chunk:
+            if os.path.isfile(os.path.join(self.cwd, chunk["source"])):
+                source = os.path.join(self.cwd, chunk["source"])
+                chunk["content"] = (
+                    "\n"
+                    + io.open(source, "r", encoding="utf-8").read().rstrip()
+                    + "\n"
+                    + chunk["content"]
+                )
             else:
                 source = chunk["source"]
                 chunk_text = chunk["content"]  # Get the text from chunk
                 module_text = self.loadstring(
-                    "import inspect\nprint(inspect.getsource(%s))" % source)  # Get the module source using inspect
+                    "import inspect\nprint(inspect.getsource(%s))" % source
+                )  # Get the module source using inspect
                 chunk["content"] = module_text[0]["text"].rstrip()
                 if chunk_text.strip() != "":
                     chunk["content"] += "\n" + chunk_text
 
-        if chunk['type'] == 'doc':
-            chunk['content'] = self.loadinline(chunk['content'])
+        if chunk["type"] == "doc":
+            chunk["content"] = self.loadinline(chunk["content"])
             return chunk
 
-
-        if chunk['type'] == 'code':
-            logger.info("Processing chunk %(number)s named %(name)s from line %(start_line)s" % chunk)
+        if chunk["type"] == "code":
+            logger.info(
+                "Processing chunk %(number)s named %(name)s from line %(start_line)s"
+                % chunk
+            )
 
             old_content = None
             if not chunk["complete"]:
                 self.pending_code += chunk["content"]
-                chunk['result'] = ''
+                chunk["result"] = ""
                 return chunk
             elif self.pending_code != "":
                 old_content = chunk["content"]
-                chunk["content"] = self.pending_code + old_content  # Code from all pending chunks for running the code
+                chunk["content"] = (
+                    self.pending_code + old_content
+                )  # Code from all pending chunks for running the code
                 self.pending_code = ""
 
-            if not chunk['evaluate']:
-                chunk['result'] = ''
+            if not chunk["evaluate"]:
+                chunk["result"] = ""
                 return chunk
 
             self.pre_run_hook(chunk)
 
-            if chunk['term']:
+            if chunk["term"]:
                 # Running in term mode can return a list of chunks
                 chunks = []
-                sources, results = self.loadterm(chunk['content'], chunk=chunk)
+                sources, results = self.loadterm(chunk["content"], chunk=chunk)
                 n = len(sources)
                 content = ""
                 for i in range(n):
@@ -163,26 +172,25 @@ class PwebProcessorBase(object):
                         new_chunk["result"] = results[i]
                         chunks.append(new_chunk)
 
-                #Deal with not output, #73
+                # Deal with not output, #73
                 if len(content) > 0:
                     new_chunk = chunk.copy()
                     new_chunk["content"] = content
                     new_chunk["result"] = ""
                     chunks.append(new_chunk)
 
-                return(chunks)
+                return chunks
             else:
-                chunk['result'] = self.loadstring(chunk['content'], chunk=chunk)
+                chunk["result"] = self.loadstring(chunk["content"], chunk=chunk)
 
-        #After executing the code save the figure
-        if chunk['fig']:
-            chunk['figure'] = self.savefigs(chunk)
+        # After executing the code save the figure
+        if chunk["fig"]:
+            chunk["figure"] = self.savefigs(chunk)
 
         if old_content is not None:
-            chunk['content'] = old_content  # The code from current chunk for display
+            chunk["content"] = old_content  # The code from current chunk for display
 
         self.post_run_hook(chunk)
-
 
         return chunk
 
@@ -214,10 +222,14 @@ class PwebProcessorBase(object):
 
         for i in range(n):
             chunk = self.parsed[i]
-            if chunk['type'] != "code":
+            if chunk["type"] != "code":
                 executed.append(self._hideinline(chunk.copy()))
             else:
-                chunks = [c for c in self._oldresults if c["number"] == i and c["type"] == "code"]
+                chunks = [
+                    c
+                    for c in self._oldresults
+                    if c["number"] == i and c["type"] == "code"
+                ]
                 executed = executed + chunks
 
         self.executed = executed
@@ -238,7 +250,7 @@ class PwebProcessorBase(object):
     def loadinline(self, content):
         """Evaluate code from doc chunks using ERB markup"""
         # Flags don't work with ironpython
-        splitted = re.split('(<%[\w\s\W]*?%>)', content)  # , flags = re.S)
+        splitted = re.split("(<%[\w\s\W]*?%>)", content)  # , flags = re.S)
         # No inline code
         if len(splitted) < 2:
             return content
@@ -247,27 +259,28 @@ class PwebProcessorBase(object):
 
         for i in range(n):
             elem = splitted[i]
-            if not elem.startswith('<%'):
+            if not elem.startswith("<%"):
                 continue
-            if elem.startswith('<%='):
-                code_str = elem.replace('<%=', '').replace('%>', '').lstrip()
+            if elem.startswith("<%="):
+                code_str = elem.replace("<%=", "").replace("%>", "").lstrip()
                 result = self.load_inline_string(code_str).strip()
                 splitted[i] = result
                 continue
-            if elem.startswith('<%'):
-                code_str = elem.replace('<%', '').replace('%>', '').lstrip()
+            if elem.startswith("<%"):
+                code_str = elem.replace("<%", "").replace("%>", "").lstrip()
                 result = self.load_inline_string(code_str).strip()
                 splitted[i] = result
-        return ''.join(splitted)
+        return "".join(splitted)
 
     def add_echo(self, code_str):
-        return 'print(%s),' % code_str
+        return "print(%s)," % code_str
 
     def _hideinline(self, chunk):
         """Hide inline code in doc mode"""
-        splitted = re.split('<%[\w\s\W]*?%>', chunk['content'])
-        chunk['content'] = ''.join(splitted)
+        splitted = re.split("<%[\w\s\W]*?%>", chunk["content"])
+        chunk["content"] = "".join(splitted)
         return chunk
+
 
 class ProtectStdStreams(object):
     def __init__(self, obj=None):

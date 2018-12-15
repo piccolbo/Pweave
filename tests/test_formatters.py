@@ -3,14 +3,14 @@ import pweave
 import pickle
 import os
 
+
 class FormatterTest(unittest.TestCase):
     """Test formatters"""
-
 
     def setUp(self):
         self.doc = pweave.Pweb("tests/formats/formatters_test.pmd")
         self.doc.run()
-        #pickle.dump(self.doc.executed, open("tests/formats/formatters_test.pkl", "wb"))
+        # pickle.dump(self.doc.executed, open("tests/formats/formatters_test.pkl", "wb"))
         with open("tests/formats/formatters_test.pkl", "rb") as f:
             e = pickle.load(f)
         self.doc.executed = e
@@ -20,7 +20,7 @@ class FormatterTest(unittest.TestCase):
     def testFormatters(self):
         formats = sorted(list(pweave.formatters.PwebFormats.formats.keys()))
         for format in formats:
-            if "pandoc2latex" in format or "2html" in format: #No pandoc on travis
+            if "pandoc2latex" in format or "2html" in format:  # No pandoc on travis
                 continue
             self.doc.setformat(format)
             self.doc.format()
@@ -30,9 +30,9 @@ class FormatterTest(unittest.TestCase):
             self.doc.write()
             if "2html" in format:
                 pass
-                #Need to ignore same amount from beginning
-                #End is variable lenght, anyway tested with test_publish
-                #self.assertSameAsReference(1000) #Ignore changing footer
+                # Need to ignore same amount from beginning
+                # End is variable lenght, anyway tested with test_publish
+                # self.assertSameAsReference(1000) #Ignore changing footer
             else:
                 self.assertSameAsReference()
             try:
@@ -45,14 +45,15 @@ class FormatterTest(unittest.TestCase):
         content = fh.read()
         fh.close()
         if end_ignore > 0:
-            return(content[:-end_ignore])
+            return content[:-end_ignore]
         return content
 
-    def assertSameAsReference(self, end_ignore = -1):
-        self.assertEqual(self.contentOf(self.out_file, end_ignore),
-               self.contentOf(self.ref_file, end_ignore))
+    def assertSameAsReference(self, end_ignore=-1):
+        self.assertEqual(
+            self.contentOf(self.out_file, end_ignore),
+            self.contentOf(self.ref_file, end_ignore),
+        )
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

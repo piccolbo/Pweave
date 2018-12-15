@@ -11,13 +11,24 @@ from .processors import *
 from .config import *
 
 
-__version__ = '0.30.3'
+__version__ = "0.30.3"
 
-def weave(file, doctype=None, informat=None, kernel="python3", plot=True,
-          docmode=False, cache=False,
-          figdir='figures', cachedir='cache',
-          figformat=None, listformats=False,
-          output=None, mimetype=None,):
+
+def weave(
+    file,
+    doctype=None,
+    informat=None,
+    kernel="python3",
+    plot=True,
+    docmode=False,
+    cache=False,
+    figdir="figures",
+    cachedir="cache",
+    figformat=None,
+    listformats=False,
+    output=None,
+    mimetype=None,
+):
     """
     Processes a Pweave document and writes output to a file
 
@@ -46,10 +57,15 @@ def weave(file, doctype=None, informat=None, kernel="python3", plot=True,
 
     assert file != "" is not None, "No input specified"
 
-    doc = Pweb(file, informat=informat, doctype=doctype,
-               kernel=kernel, output=output, figdir=figdir,
-               mimetype=mimetype
-               )
+    doc = Pweb(
+        file,
+        informat=informat,
+        doctype=doctype,
+        kernel=kernel,
+        output=output,
+        figdir=figdir,
+        mimetype=mimetype,
+    )
     doc.documentationmode = docmode
 
     rcParams["usematplotlib"] = plot
@@ -58,17 +74,19 @@ def weave(file, doctype=None, informat=None, kernel="python3", plot=True,
 
     doc.weave()
 
-def tangle(file, informat = None):
+
+def tangle(file, informat=None):
     """Tangles a noweb file i.e. extracts code from code chunks to a .py file
 
     :param file: ``string`` the pweave document containing the code
     """
-    doc = Pweb(file, kernel = None, informat = informat)
+    doc = Pweb(file, kernel=None, informat=informat)
     doc.tangle()
 
 
-def publish(file, doc_format="html", theme="skeleton", latex_engine="pdflatex",
-            output = None):
+def publish(
+    file, doc_format="html", theme="skeleton", latex_engine="pdflatex", output=None
+):
     """Publish python script and results to html or pdf, expects that doc
     chunks are  written in markdown.
 
@@ -87,8 +105,7 @@ def publish(file, doc_format="html", theme="skeleton", latex_engine="pdflatex",
         print("Unknown format, exiting")
         return
 
-    doc = Pweb(file, kernel="python3", doctype=pformat,
-               output=output)
+    doc = Pweb(file, kernel="python3", doctype=pformat, output=output)
 
     doc.theme = theme
 
@@ -104,7 +121,7 @@ def publish(file, doc_format="html", theme="skeleton", latex_engine="pdflatex",
         except:
             print("Can't find " + latex_engine + ", no pdf produced!")
             return
-        x = latex.communicate()[0].decode('utf-8')
+        x = latex.communicate()[0].decode("utf-8")
         print("\n".join(x.splitlines()[-2:]))
 
 
@@ -113,8 +130,9 @@ def spin(file):
     doc = readers.PwebConvert(file)
 
 
-def convert(file, informat="noweb", outformat="script", pandoc_args=None,
-            listformats=False):
+def convert(
+    file, informat="noweb", outformat="script", pandoc_args=None, listformats=False
+):
     """Convert input file from script to noweb or vice versa
 
     :param file: ``string`` input file
@@ -129,7 +147,7 @@ def convert(file, informat="noweb", outformat="script", pandoc_args=None,
         readers.PwebConverters.listformats()
         return
 
-    Converter = readers.PwebConverters.formats[outformat]['class']
+    Converter = readers.PwebConverters.formats[outformat]["class"]
     # pandoc_args = None skips the call to pandoc
     doc = Converter(file, informat, outformat, pandoc_args)
     doc.convert()
