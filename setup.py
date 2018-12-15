@@ -55,7 +55,7 @@ setup(
         "ipykernel",
     ],
     extras_require={
-        "test": ["scipy", "matplotlib", "coverage", "ipython", "nose", "notebook"],
+        "test": ["scipy", "matplotlib", "coverage", "nose", "notebook", "black"],
         "doc": ["sphinx", "sphinx_rtd_theme"],
     },
     license="LICENSE.txt",

@@ -1,7 +1,6 @@
 language: python
 
 python:
-  - "3.5"
   - "3.6"
 env:
   - PYTHON_FLAVOR=standard
@@ -40,6 +39,7 @@ install:
 # Run test
 script:
   - nosetests --with-coverage --cover-package=pweave
+  - black --check .
 
 # Calculate coverage
 after_success:
