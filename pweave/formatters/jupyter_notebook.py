@@ -2,23 +2,30 @@ import nbformat
 
 
 class PwebNotebookFormatter(object):
+    def __init__(
+        self,
+        executed,
+        *,
+        kernel="python3",
+        language="python",
+        mimetype="text/markdown",
+        source=None,
+        theme=None,
+        figdir=None,
+        wd=None
+    ):
 
-    def __init__(self, executed, *, kernel = "python3", language = "python",
-                 mimetype = "text/markdown", source = None, theme = None,
-                 figdir = None, wd = None):
-
-        self.notebook = {"metadata" : {
-                "kernel_info" : {
-                    "name" : kernel
+        self.notebook = {
+            "metadata": {
+                "kernel_info": {"name": kernel},
+                "language_info": {
+                    # if language_info is defined, its name field is required.
+                    "name": language
                 },
-            "language_info": {
-                # if language_info is defined, its name field is required.
-                "name": language
-            }
-        },
-        "nbformat": 4,
-        "nbformat_minor": 0,
-        "cells": [ ]
+            },
+            "nbformat": 4,
+            "nbformat_minor": 0,
+            "cells": [],
         }
 
         self.execution_count = 1
@@ -40,9 +47,7 @@ class PwebNotebookFormatter(object):
                 self.notebook["cells"].append(
                     {
                         "cell_type": self.doc_cell_type,
-                        "metadata": {
-                            "format" : self.mimetype
-                        },
+                        "metadata": {"format": self.mimetype},
                         "source": chunk["content"],
                     }
                 )
@@ -50,17 +55,17 @@ class PwebNotebookFormatter(object):
                 self.notebook["cells"].append(
                     {
                         "cell_type": "code",
-                        "execution_count" : self.execution_count,
+                        "execution_count": self.execution_count,
                         "metadata": {
                             "collapsed": False,
                             "autoscroll": "auto",
-                            "options" : chunk["options"]
+                            "options": chunk["options"],
                         },
                         "source": chunk["content"].lstrip(),
-                        "outputs" : chunk["result"]
+                        "outputs": chunk["result"],
                     }
                 )
-                self.execution_count +=1
+                self.execution_count += 1
         self.notebook = nbformat.from_dict(self.notebook)
 
     def getformatted(self):
