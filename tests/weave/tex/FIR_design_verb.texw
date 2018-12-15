@@ -52,6 +52,8 @@ Let's first define functions to plot filter properties.
 <<>>=
 from pylab import *
 import scipy.signal as signal
+import warnings
+warnings.simplefilter("ignore")
 
 #Plot frequency and phase response
 def mfreqz(b,a=1):
