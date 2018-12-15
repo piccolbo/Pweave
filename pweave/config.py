@@ -1,4 +1,3 @@
-
 rcParams = {
     "figdir": "figures",
     "usematplotlib": True,
